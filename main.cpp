@@ -2,6 +2,8 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QResource>
+#include <QDebug>
+#include <QDir>
 
 #include "stringlistmodel.h"
 #include "detailsprovider.h"
@@ -22,6 +24,12 @@ int main(int argc, char *argv[])
     Controller controller(&fileModel, &keywordModel, &outputModel);
 
     QQmlApplicationEngine engine;
+
+    QDir root(":/");
+    for (const QString &entry : root.entryList(QDir::AllEntries | QDir::NoDotAndDotDot)) {
+        qDebug() << " " << entry;
+    }
+
     engine.rootContext()->setContextProperty("fileModel", &fileModel);
     engine.rootContext()->setContextProperty("keywordModel", &keywordModel);
     engine.rootContext()->setContextProperty("outputModel", &outputModel);
