@@ -45,7 +45,6 @@ jobs:
         run: |
           mkdir searchfv-linux
           cp ${{ env.BUILD_DIR }}/appsearchfv searchfv-linux/
-          cp ${{ env.BUILD_DIR }}/README.md searchfv-linux/
           tar -czf searchfv-linux.tar.gz searchfv-linux/
 
       - name: Upload Linux artifact
