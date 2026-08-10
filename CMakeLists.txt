@@ -3,17 +3,11 @@ cmake_minimum_required(VERSION 3.16)
 project(searchfv VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(VERSION "1.0.0")
 
 find_package(Qt6 REQUIRED COMPONENTS Quick)
 find_package(pugixml REQUIRED)
 
 qt_standard_project_setup(REQUIRES 6.10)
-
-# Content of downloaded design from Figma to Qt or similar
-if (EXISTS "${CMAKE_CURRENT_LIST_DIR}/importedcontent/CMakeLists.txt")
-    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/importedcontent)
-endif()
 
 qt_add_executable(appsearchfv
     main.cpp
@@ -25,6 +19,7 @@ qt_add_executable(appsearchfv
 
 qt_add_qml_module(appsearchfv
     URI searchfv
+        VERSION 1.0
     QML_FILES
         Main.qml
         SOURCES stringlistmodel.h stringlistmodel.cpp
