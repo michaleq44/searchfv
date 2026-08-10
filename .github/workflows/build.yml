@@ -91,7 +91,8 @@ jobs:
           copy build\Release\appsearchfv.exe searchfv-windows\
           windeployqt6 searchfv-windows\appsearchfv.exe --quick --release --no-translations --no-system-d3d-compiler
           copy vcpkg\installed\x64-windows\bin\pugixml.dll searchfv-windows\
-          powershell Compress-Archive -Path searchfv-windows -DestinationPath searchfv-windows.zip
+          cd searchfv-windows
+          powershell Compress-Archive -Path * -DestinationPath ..\searchfv-windows.zip
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
