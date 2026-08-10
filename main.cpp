@@ -3,7 +3,7 @@
 #include <QQmlContext>
 #include <QResource>
 #include <QDebug>
-#include <QDir>
+#include <qfile.h>
 
 #include "stringlistmodel.h"
 #include "detailsprovider.h"
@@ -24,11 +24,6 @@ int main(int argc, char *argv[])
     Controller controller(&fileModel, &keywordModel, &outputModel);
 
     QQmlApplicationEngine engine;
-
-    QDir root(":/");
-    for (const QString &entry : root.entryList(QDir::AllEntries | QDir::NoDotAndDotDot)) {
-        qDebug() << " " << entry;
-    }
 
     engine.rootContext()->setContextProperty("fileModel", &fileModel);
     engine.rootContext()->setContextProperty("keywordModel", &keywordModel);
@@ -54,7 +49,19 @@ int main(int argc, char *argv[])
         &app,
         []() { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
-    engine.load(QUrl("qrc:/qt/qml/searchfv/Main.qml"));
+
+    QStringList possibleQMLPaths = {
+        ":/qt/qml/searchfv/Main.qml",
+        ":/searchfv/Main.qml",
+        ":/Main.qml"
+    };
+    for (const QString &path : possibleQMLPaths) {
+        if (QFile::exists(path)) {
+            qDebug() << "Found QML at:" << path;
+            engine.load(QUrl("qrc" + path));
+            break;
+        }
+    }
 
     return app.exec();
 }
