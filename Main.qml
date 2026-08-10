@@ -71,8 +71,10 @@ Window {
                             }
 
                             if (path.toLowerCase().endsWith(".xml")) {
-                                fileModel.appendString(path)
-                                fileModel.parseLastAndAddToInvoices()
+                                let added = fileModel.appendString(path)
+                                if (added) {
+                                    fileModel.parseLastAndAddToInvoices()
+                                }
                             } else {
                                 console.log("Skipping non-XML: ", path)
                             }
@@ -135,6 +137,60 @@ Window {
                                     fileModel.clear()
                                 }
                             }
+                        }
+                    }
+                }
+            }
+
+            // files output
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                border.color: sysPal.mid
+                border.width: 1
+                color: sysPal.window
+
+                ColumnLayout {
+                    anchors.fill: parent
+                    anchors.margins: 6
+
+                    Label {
+                        text: "Pliki zawierające co najmniej jedno ze słów kluczowych"
+                        font.bold: true
+                        wrapMode: Text.WordWrap
+                        Layout.fillWidth: true
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+
+                        ListView {
+                            id: outputListView
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            model: outputModel
+                            delegate: ItemDelegate {
+                                text: model.display
+                                width: parent.width
+                                onClicked: {
+                                    outputModel.clickedItem(index)
+                                    outputListView.currentIndex = index
+                                }
+                                background: Rectangle {
+                                    color: parent.highlighted ? sysPal.highlight : "transparent"
+                                }
+                                contentItem: Text {
+                                    text: parent.text
+                                    color: parent.highlighted ? sysPal.highlightedText : sysPal.windowText
+                                    elide: Text.ElideRight
+                                }
+                            }
+                            highlight: Rectangle {
+                                color: sysPal.highlight; radius: 2
+                            }
+                            focus: true
+                            clip: true
                         }
                     }
                 }
@@ -206,8 +262,9 @@ Window {
                             Button {
                                 text: "Usuń"
                                 onClicked: {
-                                    if (keywordListView.currentIndex >= 0)
+                                    if (keywordListView.currentIndex >= 0) {
                                         keywordModel.removeAt(keywordListView.currentIndex)
+                                    }
                                 }
                             }
                             Button {
@@ -221,7 +278,7 @@ Window {
                 }
             }
 
-            // files output
+            // data preview
             Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -234,60 +291,18 @@ Window {
                     anchors.margins: 6
 
                     Label {
-                        text: "Pliki zawierające co najmniej jedno ze słów kluczowych"
-                        font.bold: true
-                        wrapMode: Text.WordWrap
                         Layout.fillWidth: true
+                        text: "Podgląd"
+                        font.bold: true
                     }
 
-                    RowLayout {
+                    Text {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-
-                        ListView {
-                            id: outputListView
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            model: outputModel
-                            delegate: ItemDelegate {
-                                text: model.display
-                                width: parent.width
-                                onClicked: {
-                                    outputModel.clickedItem(index)
-                                    outputListView.currentIndex = index
-                                }
-                                background: Rectangle {
-                                    color: parent.highlighted ? sysPal.highlight : "transparent"
-                                }
-                                contentItem: Text {
-                                    text: parent.text
-                                    color: parent.highlighted ? sysPal.highlightedText : sysPal.windowText
-                                    elide: Text.ElideRight
-                                }
-                            }
-                            highlight: Rectangle {
-                                color: sysPal.highlight; radius: 2
-                            }
-                            focus: true
-                            clip: true
-                        }
+                        text: detailsProvider.detailsText
+                        color: sysPal.windowText
+                        wrapMode: Text.WordWrap
                     }
-                }
-            }
-
-            // data preview
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                border.color: sysPal.mid
-                border.width: 1
-                color: sysPal.window
-                Text {
-                    anchors.fill: parent
-                    anchors.margins: 10
-                    text: detailsProvider.detailsText
-                    color: sysPal.windowText
-                    wrapMode: Text.WordWrap
                 }
             }
         }

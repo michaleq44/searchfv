@@ -18,6 +18,7 @@ QVariant StringListModel::data(const QModelIndex &index, int role) const {
 bool StringListModel::setData(const QModelIndex &index, const QVariant &value, int role) {
     if (index.isValid() && index.row() < m_list.size() && role == Qt::EditRole) {
         m_list.replace(index.row(), value.toString());
+        if (!m_invoices.empty()) m_invoices.replace(index.row(), parseInvoice(value.toString()));
         emit dataChanged(index, index, {role});
         return true;
     }
@@ -30,11 +31,14 @@ Qt::ItemFlags StringListModel::flags(const QModelIndex &index) const {
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
 }
 
-void StringListModel::appendString(const QString &str) {
+bool StringListModel::appendString(const QString &str) {
+    if (m_list.contains(str, Qt::CaseSensitive)) return false;
     beginInsertRows(QModelIndex(), m_list.size(), m_list.size());
     m_list.append(str);
     endInsertRows();
     emit countChanged();
+
+    return true;
 }
 
 Invoice StringListModel::parseInvoice(const QString &name) {
@@ -69,6 +73,7 @@ void StringListModel::removeAt(int index) {
     if (index < 0 || index >= m_list.size()) return;
     beginRemoveRows(QModelIndex(), index, index);
     m_list.removeAt(index);
+    if (!m_invoices.empty()) m_invoices.removeAt(index);
     endRemoveRows();
     emit countChanged();
 }
@@ -78,6 +83,7 @@ void StringListModel::clear() {
     beginResetModel();
     m_list.clear();
     endResetModel();
+    m_invoices.clear();
     emit countChanged();
 }
 

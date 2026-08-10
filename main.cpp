@@ -1,6 +1,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QResource>
 
 #include "stringlistmodel.h"
 #include "detailsprovider.h"
@@ -9,6 +10,9 @@
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
+
+    Q_INIT_RESOURCE(appsearchfv_raw_qml_0);
+    Q_INIT_RESOURCE(qmake_searchfv);
 
     StringListModel fileModel;
     StringListModel keywordModel;

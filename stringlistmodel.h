@@ -29,7 +29,7 @@ class StringListModel : public QAbstractListModel
     QStringList stringList() const { return m_list; }
     QList<Invoice> invoices() const { return m_invoices; }
     Q_INVOKABLE void setStringList(const QStringList &list);
-    Q_INVOKABLE void appendString(const QString &str);
+    Q_INVOKABLE bool appendString(const QString &str);
     static Invoice parseInvoice(const QString &name);
     Q_INVOKABLE void appendToInvoices(const Invoice &invoice);
     Q_INVOKABLE void parseLastAndAddToInvoices();
