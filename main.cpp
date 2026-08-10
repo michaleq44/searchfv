@@ -1,9 +1,9 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
-#include <QResource>
 #include <QDebug>
-#include <qfile.h>
+#include <QFile>
+#include <QtQuickControls2/QQuickStyle>
 
 #include "stringlistmodel.h"
 #include "detailsprovider.h"
@@ -12,6 +12,8 @@
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
+
+    QQuickStyle::setStyle("Fusion");
 
     Q_INIT_RESOURCE(appsearchfv_raw_qml_0);
     Q_INIT_RESOURCE(qmake_searchfv);
