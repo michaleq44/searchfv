@@ -45,13 +45,12 @@ jobs:
         run: |
           mkdir searchfv-linux
           cp ${{ env.BUILD_DIR }}/appsearchfv searchfv-linux/
-          tar -czf searchfv-linux.tar.gz searchfv-linux/
 
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
         with:
           name: searchfv-linux
-          path: searchfv-linux.tar.gz
+          path: searchfv-linux
 
   build-windows:
     name: Windows (MSVC)
@@ -146,12 +145,9 @@ jobs:
           cp $PUGIXML_PATH searchfv-macos/appsearchfv.app/Contents/Frameworks/
           # Fix rpath
           install_name_tool -change $PUGIXML_PATH @rpath/libpugixml.dylib searchfv-macos/appsearchfv.app/Contents/MacOS/appsearchfv
-          # Also need to fix the framework reference if any; but this should work.
-          # Zip the .app
-          zip -r searchfv-macos.zip searchfv-macos
 
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
         with:
           name: searchfv-macos
-          path: searchfv-macos.zip
+          path: searchfv-macos
