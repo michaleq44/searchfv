@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.16)
 project(searchfv VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(VERSION "1.0.0")
 
 find_package(Qt6 REQUIRED COMPONENTS Quick)
 find_package(pugixml REQUIRED)
