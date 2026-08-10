@@ -66,7 +66,7 @@ jobs:
           version: '6.10.0'
           host: 'windows'
           target: 'desktop'
-          arch: 'win64_msvc2022_64'        # MSVC
+          arch: 'win64_msvc2022_64'
           install-deps: 'true'
 
       - name: Install pugixml via vcpkg
@@ -74,35 +74,31 @@ jobs:
           git clone https://github.com/Microsoft/vcpkg.git
           .\vcpkg\bootstrap-vcpkg.bat
           .\vcpkg\vcpkg install pugixml:x64-windows
-          echo "CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" >> $env:GITHUB_ENV
+          echo "CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: Configure CMake
         run: |
-          cmake -B ${{ env.BUILD_DIR }} `
-            -DCMAKE_BUILD_TYPE=Release `
-            -DCMAKE_TOOLCHAIN_FILE="$env:CMAKE_TOOLCHAIN_FILE" `
-            -DCMAKE_CXX_COMPILER=cl.exe `
-            -DCMAKE_C_COMPILER=cl.exe `
-            -G "Visual Studio 17 2022" -A x64
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="$env:CMAKE_TOOLCHAIN_FILE" -G "Visual Studio 17 2022" -A x64
 
       - name: Build
         run: |
-          cmake --build ${{ env.BUILD_DIR }} --config Release
+          cmake --build build --config Release
 
-      - name: Package for Windows
+      - name: Package
         shell: cmd
         run: |
           mkdir searchfv-windows
-          copy %BUILD_DIR%\Release\appsearchfv.exe searchfv-windows\
+          copy build\Release\appsearchfv.exe searchfv-windows\
           windeployqt6 searchfv-windows\appsearchfv.exe --quick --release --no-translations --no-system-d3d-compiler
           copy vcpkg\installed\x64-windows\bin\pugixml.dll searchfv-windows\
           powershell Compress-Archive -Path searchfv-windows -DestinationPath searchfv-windows.zip
 
-      - name: Upload Windows artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: searchfv-windows
           path: searchfv-windows.zip
+
 
   build-macos:
     name: macOS
