@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
         &app,
         []() { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
-    engine.loadFromModule("searchfv", "Main");
+    engine.load(QUrl("qrc:/qt/qml/searchfv/Main.qml"));
 
     return app.exec();
 }
