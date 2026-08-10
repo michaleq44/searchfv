@@ -1,2 +1,4 @@
 # FVSearch
-By michaleq44
+requires Qt6>=6.10 and pugixml on Linux
+
+by michaleq44

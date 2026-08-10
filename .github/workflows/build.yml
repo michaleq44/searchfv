@@ -1,0 +1,163 @@
+name: Build and Package
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+env:
+  BUILD_DIR: ${{ github.workspace }}/build
+
+jobs:
+  build-linux:
+    name: Linux (Ubuntu)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            qt6-base-dev \
+            qt6-declarative-dev \
+            qt6-tools-dev \
+            libpugixml-dev \
+            build-essential \
+            cmake \
+            ninja-build
+
+      - name: Configure CMake
+        run: |
+          cmake -B ${{ env.BUILD_DIR }} \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/usr \
+            -GNinja
+
+      - name: Build
+        run: |
+          cmake --build ${{ env.BUILD_DIR }} --config Release
+
+      - name: Package (just the binary)
+        run: |
+          mkdir searchfv-linux
+          cp ${{ env.BUILD_DIR }}/appsearchfv searchfv-linux/
+          cp ${{ env.BUILD_DIR }}/README.md searchfv-linux/
+          tar -czf searchfv-linux.tar.gz searchfv-linux/
+
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: searchfv-linux
+          path: searchfv-linux.tar.gz
+
+  build-windows:
+    name: Windows (MSVC)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Qt6
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: '6.7.0'                # or 6.8.0
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_msvc2022_64'
+          install-deps: 'true'
+          modules: 'qtquickcontrols2 qtsvg'
+
+      - name: Install pugixml via vcpkg
+        run: |
+          git clone https://github.com/Microsoft/vcpkg.git
+          .\vcpkg\bootstrap-vcpkg.bat
+          .\vcpkg\vcpkg install pugixml:x64-windows
+          echo "CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" >> $env:GITHUB_ENV
+
+      - name: Configure CMake
+        run: |
+          cmake -B ${{ env.BUILD_DIR }} `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DCMAKE_TOOLCHAIN_FILE="$env:CMAKE_TOOLCHAIN_FILE" `
+            -GNinja
+
+      - name: Build
+        run: |
+          cmake --build ${{ env.BUILD_DIR }} --config Release
+
+      - name: Package for Windows
+        shell: cmd
+        run: |
+          mkdir searchfv-windows
+          copy %BUILD_DIR%\appsearchfv.exe searchfv-windows\
+          copy %BUILD_DIR%\README.md searchfv-windows\
+          windeployqt6 searchfv-windows\appsearchfv.exe --quick --release --no-translations --no-system-d3d-compiler
+          copy vcpkg\installed\x64-windows\bin\pugixml.dll searchfv-windows\
+          powershell Compress-Archive -Path searchfv-windows -DestinationPath searchfv-windows.zip
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: searchfv-windows
+          path: searchfv-windows.zip
+
+  build-macos:
+    name: macOS
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Qt6
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: '6.7.0'
+          host: 'mac'
+          target: 'desktop'
+          arch: 'clang_64'
+          install-deps: 'true'
+          modules: 'qtquickcontrols2 qtsvg'
+
+      - name: Install pugixml via Homebrew
+        run: |
+          brew install pugixml
+
+      - name: Configure CMake
+        run: |
+          cmake -B ${{ env.BUILD_DIR }} \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 \
+            -GNinja
+
+      - name: Build
+        run: |
+          cmake --build ${{ env.BUILD_DIR }} --config Release
+
+      - name: Bundle macOS app
+        run: |
+          mkdir searchfv-macos
+          # If your binary is built as an app bundle, it's usually appsearchfv.app
+          # Otherwise, we create a bundle manually.
+          # The standard Qt build creates an app bundle if MACOSX_BUNDLE is TRUE.
+          cp -R ${{ env.BUILD_DIR }}/appsearchfv.app searchfv-macos/
+          macdeployqt6 searchfv-macos/appsearchfv.app -always-overwrite -appstore-compliant
+          # pugixml is not bundled by macdeployqt; copy it manually
+          # Find the dylib path
+          PUGIXML_PATH=$(brew --prefix pugixml)/lib/libpugixml.dylib
+          mkdir -p searchfv-macos/appsearchfv.app/Contents/Frameworks
+          cp $PUGIXML_PATH searchfv-macos/appsearchfv.app/Contents/Frameworks/
+          # Fix rpath
+          install_name_tool -change $PUGIXML_PATH @rpath/libpugixml.dylib searchfv-macos/appsearchfv.app/Contents/MacOS/appsearchfv
+          # Also need to fix the framework reference if any; but this should work.
+          # Zip the .app
+          zip -r searchfv-macos.zip searchfv-macos
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: searchfv-macos
+          path: searchfv-macos.zip
