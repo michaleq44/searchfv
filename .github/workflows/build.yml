@@ -82,7 +82,7 @@ jobs:
           arch: 'win64_msvc2022_64'
           dir: '${{ github.workspace }}/qt'
           install-deps: 'true'
-          modules: 'qtbase qtdeclarative'
+          modules: 'qtbase'
           set-env: 'true'
 
       - name: Configure CMake
