@@ -59,19 +59,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Set up MSVC
-        uses: ilammy/msvc-dev-cmd@v1
-
       - name: Install Ninja
         run: choco install ninja
-
-      - name: Restore vcpkg Cache
-        uses: actions/cache@v6
-        with:
-          path: $VCPKG_INSTALLATION_ROOT/installed
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
-          restore-keys: |
-            ${{ runner.os }}-vcpkg-
 
       - name: Install Qt6
         uses: jurplel/install-qt-action@v4
@@ -131,6 +120,8 @@ jobs:
           cmake -B ${{ env.BUILD_DIR }} \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 \
+            -DCMAKE_OSX_SYSROOT=$(xcrun --sdk macosx --show-sdk-path) \
+            -DCMAKE_OSX_ARCHITECTURES="arm64" \
             -GNinja
 
       - name: Build
