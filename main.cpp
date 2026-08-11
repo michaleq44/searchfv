@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QtQuickControls2/QQuickStyle>
+#include <QIcon>
 
 #include "stringlistmodel.h"
 #include "detailsprovider.h"
@@ -14,6 +15,7 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     QQuickStyle::setStyle("Fusion");
+    app.setWindowIcon(QIcon(":/assets/icon512.png"));
 
     Q_INIT_RESOURCE(appsearchfv_raw_qml_0);
     Q_INIT_RESOURCE(qmake_searchfv);
