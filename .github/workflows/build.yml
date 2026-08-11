@@ -114,7 +114,7 @@ jobs:
           version: '6.8.2'
           host: 'mac'
           target: 'desktop'
-          arch: 'macos'
+          arch: 'clang_64'
           install-deps: 'true'
           set-env: 'true'
           cache: 'true'
