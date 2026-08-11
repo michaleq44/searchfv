@@ -109,10 +109,15 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Install Qt6
-        run: brew install qt@6
-
-      - name: Set Qt env
-        run: echo "Qt6_DIR=$(brew --prefix qt@6)" >> $GITHUB_ENV
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.10.0'
+          host: 'mac'
+          target: 'desktop'
+          arch: 'clang_64'
+          install-deps: 'true'
+          set-env: 'true'
+          cache: 'true'
 
       - name: Install pugixml via Homebrew
         run: |
@@ -134,8 +139,6 @@ jobs:
 
       - name: Bundle macOS app
         run: |
-          export PATH="/opt/homebrew/opt/qt@6/bin:$PATH"
-    
           # Use absolute path to the app bundle
           APP_PATH="${{ env.BUILD_DIR }}/appsearchfv.app"
           
