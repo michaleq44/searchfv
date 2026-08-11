@@ -109,15 +109,10 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Install Qt6
-        uses: jurplel/install-qt-action@v4
-        with:
-          version: '6.8.2'
-          host: 'mac'
-          target: 'desktop'
-          arch: 'clang_64'
-          install-deps: 'true'
-          set-env: 'true'
-          cache: 'true'
+        run: brew install qt@6
+
+      - name: Set Qt env
+        run: echo "Qt6_DIR=$(brew --prefix qt@6)" >> $GITHUB_ENV
 
       - name: Install pugixml via Homebrew
         run: |
@@ -132,7 +127,6 @@ jobs:
             -DCMAKE_OSX_SYSROOT=$(xcrun --sdk macosx --show-sdk-path) \
             -DCMAKE_OSX_ARCHITECTURES="arm64" \
             -GNinja
-      
 
       - name: Build
         run: |
