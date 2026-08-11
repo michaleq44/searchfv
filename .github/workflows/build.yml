@@ -96,7 +96,7 @@ jobs:
         run: |
           mkdir dist
           copy build\appsearchfv.exe dist\
-          copy "vcpkg_installed\x64-windows\bin\pugixml.dll" dist\
+          copy build\pugixml.dll dist\
           windeployqt --release --qmldir . dist/appsearchfv.exe
 
       - name: Upload artifact
