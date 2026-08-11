@@ -59,6 +59,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
+      - name: Use MSVC
+        uses: TheMrMilchmann/setup-msvc-dev@v4
+        with:
+          arch: x64
+
       - name: Install Ninja
         run: choco install ninja
 
@@ -105,7 +110,7 @@ jobs:
       - name: Install Qt6
         uses: jurplel/install-qt-action@v4
         with:
-          version: '6.8.0'
+          version: '6.8.2'
           host: 'mac'
           target: 'desktop'
           arch: 'clang_64'
