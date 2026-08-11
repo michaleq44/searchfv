@@ -86,7 +86,7 @@ jobs:
 
       - name: Configure CMake
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}" -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_INSTALLATION_ROOT }}/scripts/buildsystems/vcpkg.cmake" -G "Ninja"
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}" -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -G "Ninja"
 
       - name: Build
         run: |
@@ -96,7 +96,7 @@ jobs:
         run: |
           mkdir dist
           copy build\appsearchfv.exe dist\
-          copy build\pugixml.dll dist\
+          copy "vcpkg_installed\x64-windows\bin\pugixml.dll" dist\
           windeployqt --release --qmldir . dist/appsearchfv.exe
 
       - name: Upload artifact
