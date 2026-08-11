@@ -77,6 +77,7 @@ jobs:
           dir: '${{ github.workspace }}/qt'
           install-deps: 'true'
           set-env: 'true'
+          cache: 'true'
 
       - name: Configure CMake
         run: |
@@ -113,8 +114,10 @@ jobs:
           version: '6.8.2'
           host: 'mac'
           target: 'desktop'
-          arch: 'clang_64'
+          arch: 'macos'
           install-deps: 'true'
+          set-env: 'true'
+          cache: 'true'
 
       - name: Install pugixml via Homebrew
         run: |
@@ -124,9 +127,10 @@ jobs:
         run: |
           cmake -B ${{ env.BUILD_DIR }} \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 \
-            -DCMAKE_OSX_SYSROOT=$(xcrun --sdk macosx --show-sdk-path) \
-            -DCMAKE_OSX_ARCHITECTURES="arm64" \
+#            -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 \
+#            -DCMAKE_OSX_SYSROOT=$(xcrun --sdk macosx --show-sdk-path) \
+#            -DCMAKE_OSX_ARCHITECTURES="arm64" \
+            -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}" \
             -GNinja
 
       - name: Build
@@ -135,22 +139,17 @@ jobs:
 
       - name: Bundle macOS app
         run: |
-          mkdir searchfv-macos
-          # If your binary is built as an app bundle, it's usually appsearchfv.app
-          # Otherwise, we create a bundle manually.
-          # The standard Qt build creates an app bundle if MACOSX_BUNDLE is TRUE.
-          cp -R ${{ env.BUILD_DIR }}/appsearchfv.app searchfv-macos/
-          macdeployqt6 searchfv-macos/appsearchfv.app -always-overwrite -appstore-compliant
+          macdeployqt appsearchfv.app -always-overwrite -appstore-compliant
           # pugixml is not bundled by macdeployqt; copy it manually
           # Find the dylib path
           PUGIXML_PATH=$(brew --prefix pugixml)/lib/libpugixml.dylib
-          mkdir -p searchfv-macos/appsearchfv.app/Contents/Frameworks
-          cp $PUGIXML_PATH searchfv-macos/appsearchfv.app/Contents/Frameworks/
+          mkdir -p appsearchfv.app/Contents/Frameworks
+          cp $PUGIXML_PATH appsearchfv.app/Contents/Frameworks/
           # Fix rpath
-          install_name_tool -change $PUGIXML_PATH @rpath/libpugixml.dylib searchfv-macos/appsearchfv.app/Contents/MacOS/appsearchfv
+          install_name_tool -change $PUGIXML_PATH @rpath/libpugixml.dylib appsearchfv.app/Contents/MacOS/appsearchfv
 
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v7
         with:
           name: searchfv-macos
-          path: searchfv-macos
+          path: appsearchfv.app
