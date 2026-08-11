@@ -134,15 +134,22 @@ jobs:
 
       - name: Bundle macOS app
         run: |
-          cp -R build/appsearchfv.app .
-          macdeployqt appsearchfv.app -always-overwrite -appstore-compliant
-          # pugixml is not bundled by macdeployqt; copy it manually
-          # Find the dylib path
+          export PATH="/opt/homebrew/opt/qt@6/bin:$PATH"
+    
+          # Use absolute path to the app bundle
+          APP_PATH="${{ env.BUILD_DIR }}/appsearchfv.app"
+          
+          # Deploy Qt frameworks
+          macdeployqt "$APP_PATH" -always-overwrite -appstore-compliant
+          
+          # Manually bundle pugixml (macdeployqt won't do this)
           PUGIXML_PATH=$(brew --prefix pugixml)/lib/libpugixml.dylib
-          mkdir -p appsearchfv.app/Contents/Frameworks
-          cp $PUGIXML_PATH appsearchfv.app/Contents/Frameworks/
-          # Fix rpath
-          install_name_tool -change $PUGIXML_PATH @rpath/libpugixml.dylib appsearchfv.app/Contents/MacOS/appsearchfv
+          mkdir -p "$APP_PATH/Contents/Frameworks"
+          cp "$PUGIXML_PATH" "$APP_PATH/Contents/Frameworks/"
+          install_name_tool -change "$PUGIXML_PATH" @rpath/libpugixml.dylib "$APP_PATH/Contents/MacOS/appsearchfv"
+          
+          # Copy final bundle to workspace root for easy artifact upload
+          cp -R "$APP_PATH" ${{ github.workspace }}/
 
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v7
