@@ -152,10 +152,11 @@ jobs:
           install_name_tool -change "$PUGIXML_PATH" @rpath/libpugixml.dylib "$APP_PATH/Contents/MacOS/appsearchfv"
           
           # Copy final bundle to workspace root for easy artifact upload
-          cp -R "$APP_PATH" ${{ github.workspace }}/
+          mkdir -p searchfv-macos
+          cp -R "$APP_PATH" ${{ github.workspace }}/searchfv-macos
 
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v7
         with:
           name: searchfv-macos
-          path: appsearchfv.app
+          path: searchfv-macos
