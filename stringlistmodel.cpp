@@ -1,4 +1,5 @@
 #include <QDebug>
+#include <qglobal.h>
 #include <string>
 
 #include "stringlistmodel.h"
@@ -46,13 +47,14 @@ bool StringListModel::appendString(const QString &str) {
 
 Invoice StringListModel::parseInvoice(const QString &name) {
     pugi::xml_document doc;
+
 #if defined(Q_OS_WIN)
     std::wstring path = name.toStdWString();
-    doc.load_file(path.c_str());
 #else
     std::string path = name.toStdString();
-    doc.load_file(path.c_str());
 #endif
+
+    doc.load_file(path.c_str());
 
     Invoice invoice;
     pugi::xml_node fvnode = doc.child("Faktura");
@@ -67,7 +69,7 @@ Invoice StringListModel::parseInvoice(const QString &name) {
         invoice.products.push_back(item);
     }
 
-    qDebug() << "loaded" << invoice.number.toStdString();
+    qDebug() << "loaded" << invoice.number;
 
     return invoice;
 }
