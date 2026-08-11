@@ -94,13 +94,15 @@ jobs:
 
       - name: Package
         run: |
-          windeployqt --release --qmldir . build/appsearchfv.exe
+          mkdir dist
+          copy build\appsearchfv.exe dist\
+          windeployqt --release --qmldir . dist/appsearchfv.exe
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
           name: searchfv-windows
-          path: build/Release
+          path: dist/
 
 
   build-macos:
