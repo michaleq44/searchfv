@@ -134,6 +134,7 @@ jobs:
 
       - name: Bundle macOS app
         run: |
+          cp -R build/appsearchfv.app .
           macdeployqt appsearchfv.app -always-overwrite -appstore-compliant
           # pugixml is not bundled by macdeployqt; copy it manually
           # Find the dylib path
