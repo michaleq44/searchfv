@@ -1,3 +1,6 @@
+#include <QDebug>
+#include <string>
+
 #include "stringlistmodel.h"
 #include "pugixml.hpp"
 
@@ -43,7 +46,13 @@ bool StringListModel::appendString(const QString &str) {
 
 Invoice StringListModel::parseInvoice(const QString &name) {
     pugi::xml_document doc;
-    doc.load_file(name.toStdString().c_str());
+#if defined(Q_OS_WIN)
+    std::wstring path = name.toStdWString();
+    doc.load_file(path.c_str());
+#else
+    std::string path = name.toStdString();
+    doc.load_file(path.c_str());
+#endif
 
     Invoice invoice;
     pugi::xml_node fvnode = doc.child("Faktura");
@@ -57,6 +66,8 @@ Invoice StringListModel::parseInvoice(const QString &name) {
         QString item = wiersz.child("P_7").text().as_string();
         invoice.products.push_back(item);
     }
+
+    qDebug() << "loaded" << invoice.number.toStdString();
 
     return invoice;
 }

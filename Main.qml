@@ -14,8 +14,8 @@ Window {
 
     MessageDialog {
         id: infoDialog
-        title: "Information"
-        text: "Information missing!"
+        title: "Info"
+        text: "Brakuje informacji!"
         buttons: MessageDialog.Ok
     }
 
@@ -64,11 +64,12 @@ Window {
                         parent.color = sysPal.window
                         let urls = drop.urls
                         for (let i = 0; i < urls.length; ++i) {
-                            let path = urls[i].toString()
-                            if (path.startsWith("file://")) {
-                                path = path.substring(7)
-                                path = decodeURIComponent(path)
+                            let path = urls[i].toString().replace(/^(file:\/{3})|(file:\/{2})/, "")
+                            path = decodeURIComponent(path)
+                            if (Qt.platform.os === "windows") {
+                                path = path.replace(/\//g, "\\")
                             }
+                            console.log("loading ", path)
 
                             if (path.toLowerCase().endsWith(".xml")) {
                                 let added = fileModel.appendString(path)
