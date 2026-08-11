@@ -94,7 +94,7 @@ jobs:
 
       - name: Package
         run: |
-          windeployqt --release --qmldir . build/Release/appsearchfv.exe
+          windeployqt --release --qmldir . build/appsearchfv.exe
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
