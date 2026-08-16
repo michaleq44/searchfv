@@ -55,34 +55,7 @@ Window {
                 border.color: sysPal.mid
                 border.width: 1
                 color: sysPal.window
-
-                DropArea {
-                    anchors.fill: parent
-                    onEntered: parent.color = sysPal.light
-                    onExited: parent.color = sysPal.window
-                    onDropped: {
-                        parent.color = sysPal.window
-                        let urls = drop.urls
-                        for (let i = 0; i < urls.length; ++i) {
-                            let path = urls[i].toString().replace(/^(file:\/{3})|(file:\/{2})/, "")
-                            path = decodeURIComponent(path)
-                            if (Qt.platform.os === "windows") {
-                                path = path.replace(/\//g, "\\")
-                            }
-                            console.log("loading ", path)
-
-                            if (path.toLowerCase().endsWith(".xml")) {
-                                let added = fileModel.appendString(path)
-                                if (added) {
-                                    fileModel.parseLastAndAddToInvoices()
-                                }
-                            } else {
-                                console.log("Skipping non-XML: ", path)
-                            }
-                        }
-                        drop.accept(Qt.CopyAction)
-                    }
-                }
+                radius: 6
 
                 ColumnLayout {
                     anchors.fill: parent
@@ -98,29 +71,71 @@ Window {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
 
-                        ListView {
-                            id: fileListView
+                        Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            model: fileModel
-                            delegate: ItemDelegate {
-                                text: model.display
-                                width: parent.width
-                                onClicked: fileListView.currentIndex = index
-                                background: Rectangle {
-                                    color: parent.highlighted ? sysPal.highlight : "transparent"
+                            color: sysPal.window
+                            border.color: sysPal.mid
+                            border.width: 1
+                            radius: 2
+
+                            ListView {
+                                id: fileListView
+                                anchors.fill: parent
+
+                                model: fileModel
+                                delegate: ItemDelegate {
+                                    text: model.display
+                                    width: parent.width
+                                    onClicked: fileListView.currentIndex = index
+                                    background: Rectangle {
+                                        color: parent.highlighted ? sysPal.highlight : "transparent"
+                                    }
+                                    contentItem: Text {
+                                        text: parent.text
+                                        color: parent.highlighted ? sysPal.highlightedText : sysPal.windowText
+                                        elide: Text.ElideRight
+                                    }
                                 }
-                                contentItem: Text {
-                                    text: parent.text
-                                    color: parent.highlighted ? sysPal.highlightedText : sysPal.windowText
-                                    elide: Text.ElideRight
+                                highlight: Item {
+                                    Rectangle {
+                                        color: sysPal.highlight
+                                        radius: 2
+                                        anchors.fill: parent
+                                        anchors.margins: 4
+                                    }
+                                }
+                                focus: true
+                                clip: true
+                            }
+
+                            DropArea {
+                                anchors.fill: parent
+                                onEntered: parent.color = sysPal.light
+                                onExited: parent.color = sysPal.window
+                                onDropped: {
+                                    parent.color = sysPal.window
+                                    let urls = drop.urls
+                                    for (let i = 0; i < urls.length; ++i) {
+                                        let path = urls[i].toString().replace(/^(file:\/{3})|(file:\/{2})/, "")
+                                        path = decodeURIComponent(path)
+                                        if (Qt.platform.os === "windows") {
+                                            path = path.replace(/\//g, "\\")
+                                        }
+                                        console.log("loading ", path)
+
+                                        if (path.toLowerCase().endsWith(".xml")) {
+                                            let added = fileModel.appendString(path)
+                                            if (added) {
+                                                fileModel.parseLastAndAddToInvoices()
+                                            }
+                                        } else {
+                                            console.log("Skipping non-XML: ", path)
+                                        }
+                                    }
+                                    drop.accept(Qt.CopyAction)
                                 }
                             }
-                            highlight: Rectangle {
-                                color: sysPal.highlight; radius: 2
-                            }
-                            focus: true
-                            clip: true
                         }
 
                         Column {
@@ -150,6 +165,7 @@ Window {
                 border.color: sysPal.mid
                 border.width: 1
                 color: sysPal.window
+                radius: 6
 
                 ColumnLayout {
                     anchors.fill: parent
@@ -166,32 +182,44 @@ Window {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
 
-                        ListView {
-                            id: outputListView
+                        Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            model: outputModel
-                            delegate: ItemDelegate {
-                                text: model.display
-                                width: parent.width
-                                onClicked: {
-                                    outputModel.clickedItem(index)
-                                    outputListView.currentIndex = index
+                            color: sysPal.window
+                            radius: 2
+                            border.color: sysPal.mid
+                            border.width: 1
+                            ListView {
+                                id: outputListView
+                                anchors.fill: parent
+                                model: outputModel
+                                delegate: ItemDelegate {
+                                    text: model.display
+                                    width: parent.width
+                                    onClicked: {
+                                        outputModel.clickedItem(index)
+                                        outputListView.currentIndex = index
+                                    }
+                                    background: Rectangle {
+                                        color: parent.highlighted ? sysPal.highlight : "transparent"
+                                    }
+                                    contentItem: Text {
+                                        text: parent.text
+                                        color: parent.highlighted ? sysPal.highlightedText : sysPal.windowText
+                                        elide: Text.ElideRight
+                                    }
                                 }
-                                background: Rectangle {
-                                    color: parent.highlighted ? sysPal.highlight : "transparent"
+                                highlight: Item {
+                                    Rectangle {
+                                        color: sysPal.highlight
+                                        radius: 2
+                                        anchors.fill: parent
+                                        anchors.margins: 4
+                                    }
                                 }
-                                contentItem: Text {
-                                    text: parent.text
-                                    color: parent.highlighted ? sysPal.highlightedText : sysPal.windowText
-                                    elide: Text.ElideRight
-                                }
+                                focus: true
+                                clip: true
                             }
-                            highlight: Rectangle {
-                                color: sysPal.highlight; radius: 2
-                            }
-                            focus: true
-                            clip: true
                         }
                     }
                 }
@@ -204,6 +232,7 @@ Window {
                 border.color: sysPal.mid
                 border.width: 1
                 color: sysPal.window
+                radius: 6
 
                 ColumnLayout {
                     anchors.fill: parent
@@ -233,29 +262,42 @@ Window {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
 
-                        ListView {
-                            id: keywordListView
+                        Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            model: keywordModel
-                            delegate: ItemDelegate {
-                                text: model.display
-                                width: parent.width
-                                onClicked: keywordListView.currentIndex = index
-                                background: Rectangle {
-                                    color: parent.highlighted ? sysPal.highlight : "transparent"
+                            color: sysPal.window
+                            border.color: sysPal.mid
+                            border.width: 1
+                            radius: 2
+
+                            ListView {
+                                id: keywordListView
+                                anchors.fill: parent
+                                model: keywordModel
+                                delegate: ItemDelegate {
+                                    text: model.display
+                                    width: parent.width
+                                    onClicked: keywordListView.currentIndex = index
+                                    background: Rectangle {
+                                        color: parent.highlighted ? sysPal.highlight : "transparent"
+                                    }
+                                    contentItem: Text {
+                                        text: parent.text
+                                        color: parent.highlighted ? sysPal.highlightedText : sysPal.windowText
+                                        elide: Text.ElideRight
+                                    }
                                 }
-                                contentItem: Text {
-                                    text: parent.text
-                                    color: parent.highlighted ? sysPal.highlightedText : sysPal.windowText
-                                    elide: Text.ElideRight
+                                highlight: Item {
+                                    Rectangle {
+                                        color: sysPal.highlight
+                                        radius: 2
+                                        anchors.fill: parent
+                                        anchors.margins: 4
+                                    }
                                 }
+                                focus: true
+                                clip: true
                             }
-                            highlight: Rectangle {
-                                color: sysPal.highlight; radius: 2
-                            }
-                            focus: true
-                            clip: true
                         }
 
                         Column {
@@ -286,6 +328,7 @@ Window {
                 border.color: sysPal.mid
                 border.width: 1
                 color: sysPal.window
+                radius: 6
 
                 ColumnLayout {
                     anchors.fill: parent
