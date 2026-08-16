@@ -117,10 +117,12 @@ Window {
                                     parent.color = sysPal.window
                                     let urls = drop.urls
                                     for (let i = 0; i < urls.length; ++i) {
-                                        let path = urls[i].toString().replace(/^(file:\/{3})|(file:\/{2})/, "")
+                                        let path = urls[i].toString().replace(/^file:\/*/, "")
                                         path = decodeURIComponent(path)
                                         if (Qt.platform.os === "windows") {
                                             path = path.replace(/\//g, "\\")
+                                        } else if (!path.startsWith("/") && path.length > 0) {
+                                            path = "/" + path
                                         }
                                         console.log("loading ", path)
 
